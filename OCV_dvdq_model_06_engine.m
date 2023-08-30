@@ -307,6 +307,85 @@ print('OCV fig9','-dpng','-r300');
 
 
 
+
+%OCP_n,OCP_p dvdq
+x_1 = x_id(1,1) + (1/x_id(1,2));
+y_1 = x_id(1,3) - (1/x_id(1,4));
+
+
+OCP_n(:,3) = ((OCP_n(:,1)-x_id(1,1))/(x_1-x_id(1,1)));
+OCP_p(:,3) = ((OCP_p(:,1)-x_id(1,3))/(y_1-x_id(1,3))); 
+
+
+x = OCP_n (1:end,3);
+y = OCP_n (1:end,2);
+
+start_value = 0;
+end_value = 1;
+
+
+window_size = 50;
+
+
+x_values = [];
+for i = 1:(length(x) - 1)
+    if x(i) >= start_value && x(i)<=end_value
+    dvdq5(i) = (y(i + 1) - y(i)) / (x(i + 1) - x(i));   
+     x_values = [x_values; x(i)];
+    end
+end
+
+x_values(end+1) = x_values(end);
+dvdq5(end+1) = dvdq5(end);
+
+
+
+x = OCP_p (1:end,3);
+y = OCP_p (1:end,2);
+
+
+x_values2 = [];
+for i = 1:(length(x) - 1)
+    if x(i) >= start_value && x(i)<=end_value
+    dvdq6(i) = (y(i + 1) - y(i)) / (x(i + 1) - x(i));   
+    if isnan(dvdq6)
+        % NaN 값의 앞쪽과 뒤쪽 데이터 포인트를 사용하여 내삽
+        dvdq6 = interp1(x([i-1, i+1]), y([i-1, i+1]), x(i));
+        % 내삽 결과를 저장
+        dvdq6(i) = dvdq6;
+    end
+        x_values2 = [x_values2; x(i)];
+    end
+end
+
+x_values2(end+1) = x_values2(end); 
+dvdq6(end+1) = dvdq6(end);
+
+
+
+% dvdq5에 이동 평균 적용
+idx_start = find(OCP_n (1:end,3) >= 0);
+first_different_idx1= idx_start(1);
+dvdq51 = movmean(dvdq5(first_different_idx1:end),window_size);
+%x_values_moving_avg = movmean(x_values, window_size);
+
+
+% dvdq6에 이동 평균 적용
+idx_start = find(OCP_p (1:end,3) >= 0);
+first_different_idx2 = idx_start(1);
+dvdq61 = movmean(dvdq6(first_different_idx2:end),window_size);
+%x_values2_moving_avg = movmean(x_values2, window_size);
+
+
+% ocp_n,ocp_p플롯
+plot(x_values, abs(dvdq51), 'b-', 'LineWidth', lw, 'MarkerSize', msz); hold on
+plot(x_values2 , dvdq61, 'r-', 'LineWidth', lw, 'MarkerSize', msz);
+
+
+
+
+
+
 % 실제 관측값과 모델의 예측 값 사이의 차이
 error =  OCV_hat-OCV3(:,2);
 
