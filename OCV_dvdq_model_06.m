@@ -1,4 +1,3 @@
-
 function [cost,OCV_sim] = OCV_dvdq_model_07(x, OCP_n1, OCP_p1, OCV2, w1, w2)
     x_0 = x(1);
     QN = x(2);
@@ -20,7 +19,7 @@ function [cost,OCV_sim] = OCV_dvdq_model_07(x, OCP_n1, OCP_p1, OCV2, w1, w2)
 
     
     % dV/dQ 값들 계산
-    window_size = 50;
+    window_size = 200;
 
     x_values = OCV2(:, 1);
     y_values = OCV2(:, 2);
@@ -45,5 +44,4 @@ function [cost,OCV_sim] = OCV_dvdq_model_07(x, OCP_n1, OCP_p1, OCV2, w1, w2)
    
     % 비용 합산 
     cost = cost_dvdq + cost_OCV;
-    
 end
